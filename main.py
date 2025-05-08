@@ -43,7 +43,7 @@ class BookGetSchema(BaseModel):
     author: str
 
 
-@app.post("/setup")
+@app.post("/setup")  # Создаём одну таблицу с книгами (в результате в корне проекта создаётся файл БД - mydb.db)
 async def setup_database():
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
@@ -63,9 +63,11 @@ async def add_book(book: BookSchema, session: SessionDep) -> BookSchema:
 
 from pydantic import BaseModel, Field
 
-class PaginationParams(BaseModel):
+
+class PaginationParams(BaseModel):  # Параметры пагинации. Пагинация - возвращение результатов с сервера не сразу, а частями; чтобы получить
+                                    # нужный результат, в запросе нужно указать параметры.
     limit: int = Field(10, ge=1, le=100, description="Количество элементов на странице")
-    offset: int = Field(0, ge=0, description="Смещение для пагинации")
+    offset: int = Field(0, ge=0, description="Смещение для пагинации")  # offset - это как-бы сдвиг при формировании результата запроса
 
 
 PaginationDep = Annotated[PaginationParams, Depends(PaginationParams)]
