@@ -75,10 +75,10 @@ PaginationDep = Annotated[PaginationParams, Depends(PaginationParams)]
 
 @app.get("/books")
 async def get_books(session: SessionDep, pagination: PaginationDep) -> list[BookGetSchema]:
-    print(pagination.limit)
-    print(pagination.offset)
-    query = select(BookModel)
-    result = await session.execute(query)
-    books = result.scalars().all()
-    print(f"{books=}")
-    return books
+    query = (
+        select(BookModel)
+        .limit(pagination.limit)
+        .offset(pagination.offset)
+    )
+    result = await session.execute((query))
+    return result.scalars().all()
